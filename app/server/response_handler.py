@@ -35,7 +35,6 @@ def success_response(data: Any = {}, message: Optional[str] = "Request resolved"
 
 
 async def api_exception_handler(request: Request, exc: ApiException):
-
     logger.warning(f"[ApiException] {exc.status_code} - {exc.message}")
     return JSONResponse(
         status_code=exc.status_code,
@@ -45,6 +44,20 @@ async def api_exception_handler(request: Request, exc: ApiException):
                 "message": exc.message,
                 "status_code": exc.status_code,
                 "type": exc.type
+            }
+        }
+    )
+
+async def unhandled_exception_handler(request: Request, exc: Exception):
+    logger.error("[Unhandled Exception]", exc_info=True)
+    return JSONResponse(
+        status_code=500,
+        content={
+            "success": False,
+            "error": {
+                "message": "Internal server error",
+                "status_code": 500,
+                "type": "unhandled_exception"
             }
         }
     )
